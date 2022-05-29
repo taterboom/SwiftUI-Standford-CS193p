@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    @ObservedObject var viewModel = EmojiMemoryGame()
+    @ObservedObject var viewModel: EmojiMemoryGame
     
     var body: some View {
         Grid(viewModel.cards) {
@@ -30,15 +30,12 @@ struct CardView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                if card.isFaceUp {
-                    RoundedRectangle(cornerRadius: cornerRadius).fill(.white)
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(.orange)
-                    Text(card.content)
-                        .font(.system(size: fontSize(for: geometry.size))).foregroundColor(.orange)
-                } else {
-                    if !card.isMatched {
-                        RoundedRectangle(cornerRadius: cornerRadius).fill(.orange)
+            if !card.isMatched {
+                Card(isFaceUp: card.isFaceUp) {
+                    ZStack {
+                        Pie(progress: 0.2)
+                        Text(card.content)
+                            .font(.system(size: fontSize(for: geometry.size))).foregroundColor(.orange)
                     }
                 }
             }
@@ -47,7 +44,12 @@ struct CardView: View {
 }
 
 struct ContentView_Previews: PreviewProvider {
+    static var viewModel: EmojiMemoryGame {
+        let viewModel = EmojiMemoryGame()
+        viewModel.choose(card: viewModel.cards[0])
+        return viewModel
+    }
     static var previews: some View {
-        EmojiMemoryGameView()
+        EmojiMemoryGameView(viewModel: ContentView_Previews.viewModel)
     }
 }
