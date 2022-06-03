@@ -14,9 +14,14 @@ struct EmojiMemoryGameView: View {
         Grid(viewModel.cards) {
             card in
             CardView(card: card).onTapGesture {
-                viewModel.choose(card: card)
+                    viewModel.choose(card: card)
             }
                 .padding(4)
+        }
+        Button("reset") {
+            withAnimation() {
+                viewModel.reset()
+            }
         }
     }
 }
@@ -27,18 +32,23 @@ struct CardView: View {
     func fontSize(for size: CGSize) -> CGFloat {
         min(size.width, size.height) * 0.7
     }
+    @State var ani = false
     
     var body: some View {
         GeometryReader { geometry in
-            if !card.isMatched {
-                Card(isFaceUp: card.isFaceUp) {
-                    ZStack {
-                        Pie(progress: 0.2)
-                        Text(card.content)
-                            .font(.system(size: fontSize(for: geometry.size))).foregroundColor(.orange)
+            VStack {
+                if card.isFaceUp || !card.isMatched {
+                    Card(isFaceUp: card.isFaceUp) {
+                        ZStack {
+                            Pie(progress: card.isFaceUp ? 1 : 0)
+                            Text(card.content)
+                                .font(.system(size: fontSize(for: geometry.size))).foregroundColor(.orange)
+                        }
                     }
+                        .transition(.scale)
                 }
             }
+            .animation(.easeInOut, value: card.isFaceUp)
         }
     }
 }

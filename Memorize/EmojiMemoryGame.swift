@@ -22,7 +22,16 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func choose(card: MemoryGame<String>.Card) {
-        model.choose(card: card)
+        let isMatchedChoice = model.choose(card: card)
+        if isMatchedChoice {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.model.hideMatchedCards()
+            }
+        }
+    }
+    
+    func reset() {
+        model = EmojiMemoryGame.createModel()
     }
     
 }

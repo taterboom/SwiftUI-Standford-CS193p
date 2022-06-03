@@ -11,6 +11,11 @@ struct Pie: Shape {
     
     var progress: Double
     
+    var animatableData: Double {
+        get { progress }
+        set { progress = newValue }
+    }
+    
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let radius = min(rect.width, rect.height) / 2

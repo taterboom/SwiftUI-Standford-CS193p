@@ -7,19 +7,36 @@
 
 import SwiftUI
 
-struct Card<ContentView>: View where ContentView: View {
+struct Card<ContentView>: View, Animatable where ContentView: View {
     let cornerRadius = 16.0
-    var isFaceUp: Bool
     var content: () -> ContentView
+    var rotation: Double = 0
+    
+    init(isFaceUp: Bool, content: @escaping () -> ContentView) {
+        self.content = content
+        self.isFaceUp = isFaceUp
+    }
+    var isFaceUp: Bool {
+        get { rotation > 90 }
+        set {
+            rotation = newValue ? 180 : 0
+        }
+    }
+    var animatableData: Double {
+        get { rotation }
+        set { rotation = newValue }
+    }
     var body: some View {
         ZStack {
-            if isFaceUp {
+            RoundedRectangle(cornerRadius: cornerRadius).fill(.orange)
+                .opacity(isFaceUp ? 0 : 1)
+            Group {
                 bg()
                 content()
-            } else {
-                RoundedRectangle(cornerRadius: cornerRadius).fill(.orange)
-            }
+            }.opacity(isFaceUp ? 1 : 0)
         }
+            .rotation3DEffect(.degrees(rotation), axis: (0, 1, 0))
+            
     }
     @ViewBuilder func bg() -> some View {
         RoundedRectangle(cornerRadius: cornerRadius).fill(.white)

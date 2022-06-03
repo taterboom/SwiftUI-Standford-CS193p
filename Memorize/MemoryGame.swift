@@ -11,18 +11,26 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     var cards: Array<Card>
     var candidateCardIndex: Int?
     
-    mutating func choose(card: Card) {
+    init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
+        cards = Array<Card>()
+        for index in 0..<numberOfPairsOfCards {
+            cards.append(Card(id: index * 2, content: cardContentFactory(index)))
+            cards.append(Card(id: index * 2 + 1, content: cardContentFactory(index)))
+        }
+        cards.shuffle()
+    }
+    
+    mutating func choose(card: Card) -> Bool {
         print("you choose \(card)")
         if let index = cards.firstIndex(where: { $0.id == card.id }) {
-            guard !cards[index].isFaceUp && !cards[index].isFaceUp else { return }
+            guard !cards[index].isFaceUp && !cards[index].isFaceUp else { return false }
             cards[index].isFaceUp = true
             if let candidateCardIndex = candidateCardIndex {
                 self.candidateCardIndex = nil
                 if (cards[candidateCardIndex].content == card.content) {
                     cards[candidateCardIndex].isMatched = true
-                    cards[candidateCardIndex].isFaceUp = false
                     cards[index].isMatched = true
-                    cards[index].isFaceUp = false
+                    return true
                 } else {
                     for index in cards.indices {
                         cards[index].isFaceUp = false
@@ -32,13 +40,14 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
                 candidateCardIndex = index
             }
         }
+        return false
     }
     
-    init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
-        cards = Array<Card>()
-        for index in 0..<numberOfPairsOfCards {
-            cards.append(Card(id: index * 2, content: cardContentFactory(index)))
-            cards.append(Card(id: index * 2 + 1, content: cardContentFactory(index)))
+    mutating func hideMatchedCards() {
+        for index in cards.indices {
+            if cards[index].isMatched {
+                cards[index].isFaceUp = false
+            }
         }
     }
     
